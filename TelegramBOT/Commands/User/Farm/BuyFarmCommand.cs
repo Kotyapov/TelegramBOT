@@ -25,55 +25,57 @@ namespace TelegramBOT.Commands.User
 
             string[] words = update.Message.Text.Split(' ');
 
-            if (words.Length < 1)
+            if (words.Length > 1)
             {
-                Console.WriteLine("error");
-                conn.Close();
-                return;
-            }
-            string commandFarmName = words[1];
-            if (!allowedFarmNames.Contains(commandFarmName.ToLower()))
-            {
-                await client.SendTextMessageAsync(update.Message.Chat.Id, "Такого бизнеса нет");
-                conn.Close();
-                return;
-            }
+                string commandFarmName = words[1];
+                if (!allowedFarmNames.Contains(commandFarmName.ToLower()))
+                {
+                    await client.SendTextMessageAsync(update.Message.Chat.Id, "Такой фермы нет\nСписок ферм\ntest\ntests");
+                    conn.Close();
+                    return;
+                }
 
-            string sqlQuery = $"SELECT test.money, test.farm, farms.farmName, farms.farmPrice FROM test JOIN farms WHERE test.tgId = '{update.Message.From.Id}' AND farms.farmName = '{commandFarmName}'";
-            MySqlCommand command = new MySqlCommand(sqlQuery, conn);
-            MySqlDataReader reader = command.ExecuteReader();
-            reader.Read();
-            int dbMoney = Convert.ToInt32(reader["money"].ToString());
-            int dbPriceFarm = Convert.ToInt32(reader["farmPrice"].ToString());
-            string dbFarmName = reader["farmName"].ToString();
-            string dbFarmNameUser = reader["farm"].ToString();
+                string sqlQuery = $"SELECT test.money, test.farm, farms.farmName, farms.farmPrice FROM test JOIN farms WHERE test.tgId = '{update.Message.From.Id}' AND farms.farmName = '{commandFarmName}'";
+                MySqlCommand command = new MySqlCommand(sqlQuery, conn);
+                MySqlDataReader reader = command.ExecuteReader();
+                reader.Read();
+                int dbMoney = Convert.ToInt32(reader["money"].ToString());
+                int dbPriceFarm = Convert.ToInt32(reader["farmPrice"].ToString());
+                string dbFarmName = reader["farmName"].ToString();
+                string dbFarmNameUser = reader["farm"].ToString();
 
-            reader.Close();
+                reader.Close();
 
-            if (commandFarmName == dbFarmNameUser)
+                if (commandFarmName == dbFarmNameUser)
+                {
+                    await client.SendTextMessageAsync(update.Message.Chat.Id, $"У вас уже имеется ферма {commandFarmName}");
+                    conn.Close();
+                    return;
+                }
+                if (dbFarmNameUser != "Нету")
+                {
+                    await client.SendTextMessageAsync(update.Message.Chat.Id, "У вас уже имеется ферма");
+                    conn.Close();
+                    return;
+                }
+                if (dbMoney < dbPriceFarm)
+                {
+                    await client.SendTextMessageAsync(update.Message.Chat.Id, "Недостаточно средств");
+                    conn.Close();
+                    return;
+                }
+                cmd.Connection = conn;
+                cmd.CommandText = $"UPDATE test JOIN farms SET test.farm = farms.farmName, test.money = test.money - farms.farmPrice WHERE test.tgId = '{update.Message.From.Id}' AND farms.farmName = '{commandFarmName}'";
+                cmd.ExecuteNonQuery();
+                await client.SendTextMessageAsync(update.Message.Chat.Id, $"Вы купили ферму {commandFarmName}");
+                conn.Close();
+                return;
+            } else
             {
-                await client.SendTextMessageAsync(update.Message.Chat.Id, $"У вас уже имеется бизнес {commandFarmName}");
+                await client.SendTextMessageAsync(update.Message.From.Id, "Вы не указали название бизнеса");
                 conn.Close();
                 return;
             }
-            if (dbFarmNameUser != "Нету")
-            {
-                await client.SendTextMessageAsync(update.Message.Chat.Id, "У вас уже имеется бизнес");
-                conn.Close();
-                return;
-            }
-            if (dbMoney < dbPriceFarm)
-            {
-                await client.SendTextMessageAsync(update.Message.Chat.Id, "Недостаточно средств");
-                conn.Close();
-                return;
-            }
-            cmd.Connection = conn;
-            cmd.CommandText = $"UPDATE test JOIN farms SET test.farm = farms.farmName, test.money = test.money - farms.farmPrice WHERE test.tgId = '{update.Message.From.Id}' AND farms.farmName = '{commandFarmName}'";
-            cmd.ExecuteNonQuery();
-            await client.SendTextMessageAsync(update.Message.Chat.Id, $"Вы купили бизнес {commandFarmName}");
-            conn.Close();
-            return;
 
         }
 

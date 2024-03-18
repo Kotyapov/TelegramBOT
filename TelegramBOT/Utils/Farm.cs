@@ -23,7 +23,7 @@ namespace TelegramBOT
             reader.Read();
             string farm = reader["farm"].ToString();
             reader.Close();
-            if(farm == "test1")
+            if(farm == "tests")
             {
                 int num = 0;
                 TimerCallback tm = new TimerCallback(Count);
@@ -49,7 +49,7 @@ namespace TelegramBOT
             conn.Open();
             var cmd = new MySqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = $"UPDATE test SET money = money + '{x}' WHERE farm = 'test1'";
+            cmd.CommandText = $"UPDATE test SET money = money + '{x}' WHERE farm = 'tests'";
             cmd.ExecuteNonQuery();
             conn.Close();
         }

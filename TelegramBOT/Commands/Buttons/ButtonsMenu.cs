@@ -71,7 +71,7 @@ namespace TelegramBOT.Commands.ButtonKeyboard
                             },
                             new KeyboardButton[]
                             {
-                                new KeyboardButton("Бизнесы")
+                                new KeyboardButton("Фермы")
                             }
                 })
                 {

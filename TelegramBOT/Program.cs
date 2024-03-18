@@ -58,7 +58,7 @@ namespace TelegramBOT
             ErrorDebug err = new ErrorDebug();
             Farm farm = new Farm();
             VIP vip = new VIP();
-            var client = new TelegramBotClient("");
+            var client = new TelegramBotClient("6941632058:AAH0Uh6W5mnc4WhZE01lD4ZGQL20hh97dgM");
             client.StartReceiving(mainHandler);
             var me = client.GetMeAsync().Result;
             //Info

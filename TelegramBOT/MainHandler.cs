@@ -116,7 +116,7 @@ if(commandHandlers.ContainsKey(update.Message.Text.ToLower()))
             {
                 await _myFarm.HandleUpdateAsync(client, update, token);
             }
-            else if (update.Message.Text.ToLower().Contains("купитьбс"))
+            else if (update.Message.Text.ToLower().Contains("купить"))
             {
                 await _buyFarmCommand.HandleUpdateAsync(client, update, token);
             }
